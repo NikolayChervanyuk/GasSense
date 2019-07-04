@@ -14,7 +14,7 @@ int offsetVal = 660;
 
 //Used to compare weather a higher 
 //concentration of gas or smoke is present in air
-int previousValue = 0;
+int previousValue = 660;
 
 bool flag = false;
 
