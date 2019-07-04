@@ -1,0 +1,67 @@
+const int pin3 = 3; //Powers the piezo buzzer
+int sensor = A0; // pin A0 used for sensor reading
+int redLight = A1; //pin A1 powers the red light of the RGB LED
+int blueLight = A2; //pin A2 powers the blue light of the RGB LED
+int greenLight = A3; //pin A3 powers the green light of the RGB LED
+// Set the initial sensorValue to 0
+int sensorValue = 0;
+
+//The value at which the sensor will be activated
+int sensitivityVal = 50;
+
+//Value, at witch no gas is being detected
+int offsetVal = 660;
+
+//Used to compare weather a higher 
+//concentration of gas or smoke is present in air
+int previousValue = 0;
+
+bool flag = false;
+
+void setup()
+{
+  pinMode(pin3, OUTPUT);
+  // Initialize serial communication at 9600 bits per second
+  Serial.begin(9600);
+}
+
+// The loop routine runs over and over again forever
+void loop()
+{
+  // Read the input on analog pin 0 (named 'sensor')
+  sensorValue = analogRead(sensor);
+  // Print out the value you read
+  Serial.println(sensorValue, DEC);
+  // If sensorValue is greater than 500
+  if (sensorValue > offsetVal + 20)
+  {
+    //if the sensor encounters pollution, higher than 50 points
+    //The alarm will be activated
+    if(previousValue <= sensorValue  - sensitivityVal)
+    {
+      flag = true;
+    }
+    analogWrite(redLight, 255);
+    analogWrite(greenLight, 0);
+    analogWrite(blueLight, 0);
+    tone(pin3, 3000, 500);
+    delay(1000);
+  }
+  else
+  {
+    analogWrite(redLight, 0);
+    analogWrite(greenLight, 255);
+    analogWrite(blueLight, 0);
+    delay(100);
+    analogWrite(greenLight, 0);
+  	delay(250);
+  }
+  if(flag)
+  {
+    Serial.print("Increase in pollution by "); 
+    Serial.print(sensorValue - previousValue);
+    Serial.println(" points");
+    previousValue = sensorValue;
+  	flag = false;
+  }
+}
